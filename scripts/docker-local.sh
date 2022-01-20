@@ -1,6 +1,10 @@
 #!/usr/bin/bash
 
-docker run -d \
+if test -z "${DOCKER}"; then
+    export DOCKER=nerdctl
+fi
+
+${DOCKER} run -d \
     --name poller \
     --network host \
     -e WEBEX_TEAMS_ACCESS_TOKEN="${WEBEX_TEAMS_ACCESS_TOKEN}" \
