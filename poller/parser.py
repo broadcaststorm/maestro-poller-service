@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""
-TODO: Account for webex teams not grouping words within ""
-
-"""
 
 import library
 
 
 # TODO: Convert this hack to click or typer
-def project_list(svc, args=None):
+def project_list(svc, args=None, **kwargs):
     """
     Commands supported:
         project list: summarized list of all projects
@@ -32,7 +28,7 @@ def project_list(svc, args=None):
     return library.get_project_details(svc, args[0])
 
 
-def project_create(svc, args):
+def project_create(svc, args, **kwargs):
     """
     @Lab project create name "title" "description"
     """
@@ -43,7 +39,7 @@ def project_create(svc, args):
     return library.create_project(svc, args[0], args[1], args[2])
 
 
-def scenario_list(svc, args=None):
+def scenario_list(svc, args=None, **kwargs):
     """
     Commands supported:
         scenario list: summarized list of all projects
@@ -67,7 +63,7 @@ def scenario_list(svc, args=None):
     return library.get_scenario_details(svc, args[0])
 
 
-def scenario_create(svc, args):
+def scenario_create(svc, args, **kwargs):
     """
     @Lab scenario create name project "title" "description"
     """
@@ -105,9 +101,10 @@ def help():
 
 def parse_command_list(svc, list_of_cmds):
     """
-    Expecting a list of (id, command) pairs where:
+    Expecting a list of (id, command, email) triplets where:
     - id is the message ID
     - command is the text of the message
+    - email is the personEmail attribute of the message
 
     Responsibility - loop over each message, parse the requested command,
     make the correct maestro library call for each command, return a list
@@ -121,7 +118,7 @@ def parse_command_list(svc, list_of_cmds):
     return_responses = list()
 
     # Loop over all the messages
-    for (id, msg) in list_of_cmds:
+    for (id, msg, email) in list_of_cmds:
 
         # Strip the bot name out of the message
         words = msg[3:].split()
@@ -159,9 +156,9 @@ def parse_command_list(svc, list_of_cmds):
         command_parse = supported_commands[words[0]][words[1]]
 
         if len(words) > 2:
-            result = command_parse(svc, words[2:])
+            result = command_parse(svc, words[2:], email=email)
         else:
-            result = command_parse(svc)
+            result = command_parse(svc, email=email)
 
         return_responses.append((id, result))
 

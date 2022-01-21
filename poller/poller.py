@@ -48,7 +48,7 @@ def get_latest_commands(webex, room_id, latest_message_id, max_messages):
         return None, list()
 
     # Convert the Message list to Python native format
-    commands = {msg.id: msg.text for msg in msg_iter}
+    commands = {msg.id: (msg.text, msg.personEmail) for msg in msg_iter}
 
     # Python 3.7+ guarantees key order so... get the most recent unread msgs
     msg_ids: list(int) = list(commands.keys())
@@ -68,9 +68,9 @@ def get_latest_commands(webex, room_id, latest_message_id, max_messages):
     # Now, reverse the order to process commands in order
     new_msg_ids.reverse()
 
-    # Build the commands to be parsed
+    # Build the commands to be parsed (id, command, email)
     return_commands = [
-        (id, str(commands[id])) for id in new_msg_ids
+        (id, str(commands[id][0]), str(commands[id][1])) for id in new_msg_ids
     ]
 
     return latest_message_id, return_commands
