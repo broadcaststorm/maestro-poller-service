@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+
+import datetime
+
 import library
 
 
@@ -74,6 +77,83 @@ def scenario_create(svc, args, **kwargs):
     return library.create_scenario(svc, args[0], args[1], args[2], args[3])
 
 
+def reserve_project(svc, args, email=None, **kwargs):
+    """
+    @Lab reserve project X N units
+
+    args is list with those arguments in a python list:
+        X is a project name
+        N is a number
+        units is hours or days
+
+    email is used as part of the reservation to ID who is
+    making the request.
+    """
+
+    message = [
+        "Usage: reserve project X for N units",
+        "\tX: project name",
+        "\tN: a number",
+        "\tunits: either hours or days"
+    ]
+
+    # This should not happen, but let's catch it here
+    if not email:
+        return "An email address was not propagated from Webex"
+
+    # Some crude error checking here
+    if (len(args) != 4) or (args[1] != 'for') or \
+       (not int(args[2])) or (args[3] not in ['hours', 'days']):
+        return "\n".join(message)
+
+    # Convert time to a timedelta
+    if args[3] == 'hours':
+        delta = datetime.timedelta(hours=int(args[2]))
+    else:
+        delta = datetime.timedelta(days=int(args[2]))
+
+    # Extract
+    seconds = delta.total_seconds()
+
+    return library.create_reservation(
+        svc, project=args[0], duration=seconds, email=email
+    )
+
+
+def reserve_cancel(svc, args, email=None, **kwargs):
+    # This should not happen, but let's catch it here
+    if not email:
+        return "An email address was not propagated from Webex"
+
+    if not args or len(args) != 1:
+        return 'Usage: reserve cancel project_name'
+
+    return library.cancel_reservation(svc, project=args[0], email=email)
+
+
+def reserve_list(svc, args=None, **kwargs):
+    """
+    Commands supported:
+        reserve list: list of all project reservations
+        reserve list [name]: reservation details of single project
+
+    Returns a string to be output to the user
+
+    No restriction on who can see reservations
+    """
+
+    # No arg, get all scenarios
+    if not args:
+        return library.get_list_of_reservations(svc)
+
+    # Arg validation.  Ensure single name.
+    if len(args) > 1:
+        inputs = str(args)
+        return f'Only one project should be specified:\n\t{inputs}'
+
+    return library.get_reservation_details(svc, project=args[0])
+
+
 supported_commands = {
     'project': {
         'list': project_list,
@@ -82,6 +162,11 @@ supported_commands = {
     'scenario': {
         'list': scenario_list,
         'create': scenario_create,
+    },
+    'reserve': {
+        'list': reserve_list,
+        'project': reserve_project,
+        'cancel': reserve_cancel
     }
 }
 
@@ -124,7 +209,7 @@ def parse_command_list(svc, list_of_cmds):
         words = msg[3:].split()
 
         # Special case: help
-        if words[0] == 'help':
+        if len(words) == 0 or words[0] == 'help':
             result = help()
 
             return_responses.append((id, result))
