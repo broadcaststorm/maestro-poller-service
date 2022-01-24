@@ -1,0 +1,13 @@
+{
+    "id": "104-character string",
+    "roomId": "100-character string",
+    "roomType": "group",
+    "text": "Message text",
+    "personId": "79 char string",
+    "personEmail": "email address",
+    "html": "<p><spark-mention data-object-type=\"person\" data-object-id=\"79 char string\">Lab</spark-mention> Message text</p>",
+    "mentionedPeople": [
+      "79 char string"
+    ],
+    "created": "2022-01-20T21:47:36.304Z"
+}
