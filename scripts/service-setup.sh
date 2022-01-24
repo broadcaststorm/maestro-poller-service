@@ -17,3 +17,7 @@ fi
 export CONDUCTOR_PROTO='http'
 export CONDUCTOR_HOST='localhost'
 export CONDUCTOR_PORT='8000'
+
+export BUFFER_PROTO='https'
+export BUFFER_HOST='safe-tundra-80304.herokuapp.com'
+export BUFFER_PORT='443'

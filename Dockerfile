@@ -10,12 +10,16 @@ ENV PYTHONUNBUFFERED=1
 # WebEx Teams Environment Variables (override for production use)
 ENV WEBEX_TEAMS_ACCESS_TOKEN='token'
 ENV WEBEX_TEAMS_ROOM_TITLE='title'
-ENV WEBEX_TEAMS_POLLING_INTERVAL='15'
+ENV WEBEX_TEAMS_POLLING_INTERVAL='5'
 
 # Conductor API Web Service information (override for production use)
 ENV CONDUCTOR_PROTO='http'
 ENV CONDUCTOR_HOST='localhost'
 ENV CONDUCTOR_PORT='8000'
+
+ENV BUFFER_PROTO='http'
+ENV BUFFER_HOST='localhost'
+ENV BUFFER_PORT='7000'
 
 WORKDIR /app
 COPY . /app
@@ -33,4 +37,4 @@ RUN python -m pip install -r requirements.txt
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-CMD ["python", "poller/poller.py"]
+CMD ["python", "poller/buffer.py"]
